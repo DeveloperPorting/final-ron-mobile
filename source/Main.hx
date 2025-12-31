@@ -123,6 +123,10 @@ class Main extends Sprite
 		FlxG.autoPause = false;
 		FlxG.mouse.visible = false;
 		#end
+
+		#if android
+		FlxG.android.preventDefaultKeys = [BACK];
+		#end
 	}
 
 	public function getFPS():Float
