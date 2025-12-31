@@ -106,7 +106,6 @@ class Main extends Sprite
 		ClientPrefs.loadDefaultKeys();
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen));
 
-		#if !mobile
 		fpsVar = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
@@ -114,11 +113,14 @@ class Main extends Sprite
 		if(fpsVar != null) {
 			fpsVar.visible = ClientPrefs.showFPS;
 		}
-		#end
 
 		#if html5
 		FlxG.autoPause = false;
 		FlxG.mouse.visible = false;
+		#end
+
+		#if android
+		FlxG.android.preventDefaultKeys = [BACK];
 		#end
 	}
 
