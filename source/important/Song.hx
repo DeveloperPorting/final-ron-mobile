@@ -6,7 +6,7 @@ import haxe.Json;
 import haxe.format.JsonParser;
 import lime.utils.Assets;
 
-#if sys
+#if desktop
 import sys.io.File;
 import sys.FileSystem;
 #end
@@ -102,7 +102,7 @@ class Song
 		#end
 
 		if(rawJson == null) {
-			#if sys
+			#if desktop
 			rawJson = File.getContent(Paths.json(formattedFolder + '/' + formattedSong)).trim();
 			#else
 			rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();

@@ -231,7 +231,7 @@ class Paths
 
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
-		#if sys
+		#if desktop
 		if (FileSystem.exists(getPreloadPath(key)))
 			return File.getContent(getPreloadPath(key));
 
