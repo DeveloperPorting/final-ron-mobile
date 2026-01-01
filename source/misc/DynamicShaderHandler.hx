@@ -2,9 +2,7 @@ package misc;
 import openfl.display.GraphicsShader;
 import flixel.FlxG;
 import flixel.graphics.tile.FlxGraphicsShader;
-#if sys
-import sys.FileSystem;
-#end
+import openfl.utils.Assets;
 import flixel.FlxCamera;
 
 using StringTools;
@@ -35,30 +33,24 @@ class DynamicShaderHandler
 	{
 		var fragSource:String = "";
 		var vertSource:String = "";
-		#if sys
+		// no more sys
 		var path = Paths.shaderFragment(fileName);
 		
-
-		if (FileSystem.exists(path))
+		if (Assets.exists(path))
 		{
-			fragSource = sys.io.File.getContent(path);
+			fragSource = Assets.getText(path);
 		}
-
-		
 		var path2 = Paths.shaderVertex(fileName);
 		
-
-		if (FileSystem.exists(path2))
+		if (Assets.exists(path2))
 		{
-			vertSource = sys.io.File.getContent(path2);
+			vertSource = Assets.getText(path2);
 		}
-		#end
 		if (fragSource != "" || vertSource != "")
 		{
 
 			shader = new FlxGraphicsShader(fragSource, optimize, vertSource);
 		}
-
 		if (shader == null)
 		{
 			return;
