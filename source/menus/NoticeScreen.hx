@@ -20,7 +20,8 @@ import options.GraphicsSettingsSubState;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-import flixel.sound.FlxSound;
+
+import flixel.system.FlxSound;
 import flixel.math.FlxMath;
 import flixel.system.ui.FlxSoundTray;
 import lime.app.Application;

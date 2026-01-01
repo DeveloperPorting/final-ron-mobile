@@ -1,5 +1,4 @@
 package flixel;
-
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;

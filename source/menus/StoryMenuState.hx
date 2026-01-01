@@ -50,7 +50,9 @@ class StoryMenuState extends MusicBeatState
 
 	var loadedWeeks:Array<WeekData> = [];
 
+	#if desktop
 	public var video:misc.MP4Handler = new misc.MP4Handler();
+	#end
 
 	public static var musicTime:Float;
 
@@ -335,12 +337,16 @@ class StoryMenuState extends MusicBeatState
 				case 0:
 					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
+						#if VIDEOS_ALLOWED
 						video.playMP4(Paths.videoRon('ron'), new PlayState(), false, false, false);
+						#end
 					});
 				case 2:
 					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
+						#if VIDEOS_ALLOWED
 						video.playMP4(Paths.videoRon('trojanvirus'), new PlayState(), false, false, false);
+						#end
 					});
 				default:
 					new FlxTimer().start(1, function(tmr:FlxTimer)

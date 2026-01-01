@@ -18,4 +18,5 @@ export/*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-Project.xml
+.haxelib/ 
+# n quero matar o cell do cream tendo q enviar a pasta haxelib toda hora :p

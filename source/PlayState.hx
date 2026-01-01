@@ -30,7 +30,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-import flixel.sound.FlxSound;
+import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -275,7 +275,9 @@ class PlayState extends MusicBeatState
 
 	var precacheList:Map<String, String> = new Map<String, String>();
 
+	#if VIDEOS_ALLOWED
 	var video:MP4Handler = new MP4Handler();
+	#end
 
 	var satan:BGSprite;
 	var firebg:FlxSprite;
@@ -4224,7 +4226,9 @@ var cameraTwn:FlxTween;
 				cancelMusicFadeTween();
 				if (SONG.song.toLowerCase() == 'bloodshed')
 				{
+					#if VIDEOS_ALLOWED
 					video.playMP4(Paths.video('bloodshed'), new PlayState(), false, false, false);
+					#end
 				}
 				else
 				{

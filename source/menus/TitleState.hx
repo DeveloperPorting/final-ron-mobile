@@ -27,7 +27,7 @@ import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-import flixel.sound.FlxSound;
+import flixel.system.FlxSound;
 import flixel.system.ui.FlxSoundTray;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
@@ -454,15 +454,6 @@ class TitleState extends MusicBeatState
 
 		super.update(elapsed);
 	}
-
-	function fuckyou(){
-		#if desktop
-		MusicBeatState.switchState(new menus.MainMenuState());
-		#else
-		MusicBeatState.switchState(new menus.PiracyScreen());
-		#end
-	}
-
 	function createCoolText(textArray:Array<String>, ?offset:Float = 0)
 	{
 		for (i in 0...textArray.length)
