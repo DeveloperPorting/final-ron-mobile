@@ -36,6 +36,7 @@ class FreeplayState extends MusicBeatState
 	var selector:FlxText;
 	var curSelected:Int = 0;
 	var curDifficulty:Int = -1;
+
 	private static var lastDifficultyName:String = '';
 
 	var scoreBG:FlxSprite;
@@ -59,15 +60,20 @@ class FreeplayState extends MusicBeatState
 	var colorTween:FlxTween;
 	var camWhat:FlxCamera;
 	var camText:FlxCamera;
-	var chromeOffset = (ClientPrefs.rgbintense/350);
+	var chromeOffset = (ClientPrefs.rgbintense / 350);
 	var hasAccepted:Bool = false;
+
+	#if VIDEOS_ALLOWED
+	var video:hxcodec.flixel.FlxVideo = new hxcodec.flixel.FlxVideo();
+	#end
+
 	public static var mode:String = 'main';
 
 	override function create()
 	{
 		Paths.clearStoredMemory();
-		//Paths.clearUnusedMemory();
-		
+		// Paths.clearUnusedMemory();
+
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 		persistentUpdate = persistentDraw = false;
@@ -83,12 +89,17 @@ class FreeplayState extends MusicBeatState
 		FlxG.cameras.add(camText);
 		FlxCamera.defaultCameras = [camWhat];
 		CustomFadeTransition.nextCamera = camText;
-		for (i in 0...WeekData.weeksList.length) {
-			if(weekIsLocked(WeekData.weeksList[i])) continue;
+		for (i in 0...WeekData.weeksList.length)
+		{
+			if (weekIsLocked(WeekData.weeksList[i]))
+				continue;
 
-			if (mode == 'main' && WeekData.weeksList[i] != 'mainweek' && WeekData.weeksList[i] != 'week2') continue;
-			else if (mode == 'extras' && WeekData.weeksList[i] != 'freeplayshit') continue;
-			else if (mode == 'classic' && WeekData.weeksList[i] != 'classic') continue;
+			if (mode == 'main' && WeekData.weeksList[i] != 'mainweek' && WeekData.weeksList[i] != 'week2')
+				continue;
+			else if (mode == 'extras' && WeekData.weeksList[i] != 'freeplayshit')
+				continue;
+			else if (mode == 'classic' && WeekData.weeksList[i] != 'classic')
+				continue;
 
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			var leSongs:Array<String> = [];
@@ -102,7 +113,7 @@ class FreeplayState extends MusicBeatState
 			for (song in leWeek.songs)
 			{
 				var colors:Array<Int> = song[2];
-				if(colors == null || colors.length < 3)
+				if (colors == null || colors.length < 3)
 				{
 					colors = [146, 113, 253];
 				}
@@ -110,15 +121,15 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		/*		//KIND OF BROKEN NOW AND ALSO PRETTY USELESS//
+		/*//KIND OF BROKEN NOW AND ALSO PRETTY USELESS//
 
-		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
-		for (i in 0...initSonglist.length)
-		{
-			if(initSonglist[i] != null && initSonglist[i].length > 0) {
-				var songArray:Array<String> = initSonglist[i].split(":");
-				addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
-			}
+			var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
+			for (i in 0...initSonglist.length)
+			{
+				if(initSonglist[i] != null && initSonglist[i].length > 0) {
+					var songArray:Array<String> = initSonglist[i].split(":");
+					addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
+				}
 		}*/
 
 		bg = new FlxSprite();
@@ -127,13 +138,13 @@ class FreeplayState extends MusicBeatState
 			bg.frames = Paths.getSparrowAtlas('freeplaymenu/classicbgAnimate');
 		bg.animation.addByPrefix('animate', 'animate', 24, true);
 		bg.animation.play('animate');
-		bg.scale.set(2,2);
+		bg.scale.set(2, 2);
 		bg.updateHitbox();
 		bg.screenCenter();
 		add(bg);
 
 		var darkportrait:FlxSprite = new FlxSprite().loadGraphic(Paths.image('freeplayportraits/ron'));
-		darkportrait.scale.set(0.5,0.5);
+		darkportrait.scale.set(0.5, 0.5);
 		darkportrait.updateHitbox();
 		darkportrait.antialiasing = ClientPrefs.globalAntialiasing;
 		add(darkportrait);
@@ -141,12 +152,12 @@ class FreeplayState extends MusicBeatState
 		darkportrait.color = FlxColor.BLACK;
 
 		portrait = new FlxSprite().loadGraphic(Paths.image('freeplayportraits/ron'));
-		portrait.scale.set(0.5,0.5);
+		portrait.scale.set(0.5, 0.5);
 		portrait.updateHitbox();
 		portrait.antialiasing = ClientPrefs.globalAntialiasing;
 		add(portrait);
 		portrait.screenCenter(XY);
-		
+
 		var bar:FlxSprite = new FlxSprite();
 		bar.frames = Paths.getSparrowAtlas('freeplayportraits/bar');
 		bar.animation.addByPrefix('bar', 'bar', 24, true);
@@ -154,39 +165,39 @@ class FreeplayState extends MusicBeatState
 		bar.screenCenter();
 		add(bar);
 		bar.x += 30;
-		
+
 		portraitOverlay = new FlxSprite().loadGraphic(Paths.image('freeplayportraits/ron'));
-		portraitOverlay.scale.set(0.5,0.5);
+		portraitOverlay.scale.set(0.5, 0.5);
 		portraitOverlay.updateHitbox();
 		portraitOverlay.antialiasing = ClientPrefs.globalAntialiasing;
 		add(portraitOverlay);
 		portraitOverlay.screenCenter(XY);
 		portraitOverlay.visible = false;
-		
+
 		var coolemitter:FlxEmitter = new FlxEmitter();
-		coolemitter.width = FlxG.width*1.5;
+		coolemitter.width = FlxG.width * 1.5;
 		coolemitter.launchMode = SQUARE;
 		coolemitter.velocity.set(0, -5, 0, -10);
 		coolemitter.angularVelocity.set(-10, 10);
 		coolemitter.lifespan.set(5);
 		coolemitter.y = FlxG.height;
-		
+
 		var coolzemitter:FlxEmitter = new FlxEmitter();
-		coolzemitter.width = FlxG.width*1.5;
+		coolzemitter.width = FlxG.width * 1.5;
 		coolzemitter.launchMode = SQUARE;
 		coolzemitter.velocity.set(0, 5, 0, 10);
 		coolzemitter.angularVelocity.set(-10, 10);
 		coolzemitter.lifespan.set(5);
-		
+
 		for (i in 0...150)
 		{
 			var p = new FlxParticle();
 			var p2 = new FlxParticle();
-			p.makeGraphic(6,6,FlxColor.BLACK);
-			p2.makeGraphic(12,12,FlxColor.BLACK);
+			p.makeGraphic(6, 6, FlxColor.BLACK);
+			p2.makeGraphic(12, 12, FlxColor.BLACK);
 
 			coolemitter.add(p);
-			coolemitter.add(p2);					
+			coolemitter.add(p2);
 			coolzemitter.add(p);
 			coolzemitter.add(p2);
 		}
@@ -201,7 +212,7 @@ class FreeplayState extends MusicBeatState
 
 		for (i in 0...songs.length)
 		{
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName.replace("-"," "), true, false);
+			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName.replace("-", " "), true, false);
 			songText.isMenuItem = true;
 			songText.targetY = i;
 			songText.ID = i;
@@ -217,8 +228,8 @@ class FreeplayState extends MusicBeatState
 					letter.x *= textScale;
 					letter.offset.x *= textScale;
 				}
-				//songText.updateHitbox();
-				//trace(songs[i].songName + ' new scale: ' + textScale);
+				// songText.updateHitbox();
+				// trace(songs[i].songName + ' new scale: ' + textScale);
 			}
 
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
@@ -232,7 +243,7 @@ class FreeplayState extends MusicBeatState
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
-			portrait.loadGraphic(Paths.image('freeplayportraits/'+songs[i].songName.toLowerCase()));// it would be funny if this actually worked
+			portrait.loadGraphic(Paths.image('freeplayportraits/' + songs[i].songName.toLowerCase())); // it would be funny if this actually worked
 		}
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
@@ -248,9 +259,10 @@ class FreeplayState extends MusicBeatState
 
 		add(scoreText);
 
-		if(curSelected >= songs.length) curSelected = 0;
+		if (curSelected >= songs.length)
+			curSelected = 0;
 
-		if(lastDifficultyName == '')
+		if (lastDifficultyName == '')
 		{
 			lastDifficultyName = CoolUtil.defaultDifficulty;
 		}
@@ -293,18 +305,18 @@ class FreeplayState extends MusicBeatState
 		text.setFormat(Paths.font("w95.otf"), size, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
-		
-		var chromeOffset = (ClientPrefs.rgbintense/350);
+
+		var chromeOffset = (ClientPrefs.rgbintense / 350);
 		shadering();
-		
+
 		var modeText = new FlxText(10, 10, 0, FreeplayState.mode.toUpperCase(), 48);
 		modeText.setFormat(Paths.font("w95.otf"), 48, FlxColor.WHITE, LEFT);
 		add(modeText);
 		super.create();
-
 	}
 
-	override function closeSubState() {
+	override function closeSubState()
+	{
 		changeSelection(0, false);
 		super.closeSubState();
 	}
@@ -314,30 +326,35 @@ class FreeplayState extends MusicBeatState
 		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
 	}
 
-	function weekIsLocked(name:String):Bool {
+	function weekIsLocked(name:String):Bool
+	{
 		var leWeek:WeekData = WeekData.weeksLoaded.get(name);
-		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
+		return (!leWeek.startUnlocked
+			&& leWeek.weekBefore.length > 0
+			&& (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
 
 	/*public function addWeek(songs:Array<String>, weekNum:Int, weekColor:Int, ?songCharacters:Array<String>)
-	{
-		if (songCharacters == null)
-			songCharacters = ['bf'];
-
-		var num:Int = 0;
-		for (song in songs)
 		{
-			addSong(song, weekNum, songCharacters[num]);
-			this.songs[this.songs.length-1].color = weekColor;
+			if (songCharacters == null)
+				songCharacters = ['bf'];
 
-			if (songCharacters.length != 1)
-				num++;
-		}
+			var num:Int = 0;
+			for (song in songs)
+			{
+				addSong(song, weekNum, songCharacters[num]);
+				this.songs[this.songs.length-1].color = weekColor;
+
+				if (songCharacters.length != 1)
+					num++;
+			}
 	}*/
-
 	var instPlaying:Int = -1;
+
 	private static var vocals:FlxSound = null;
+
 	var holdTime:Float = 0;
+
 	override function update(elapsed:Float)
 	{
 		portraitOverlay.y = portrait.y;
@@ -345,17 +362,17 @@ class FreeplayState extends MusicBeatState
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
-		
+
 		for (song in grpSongs.members)
 		{
 			song.forceX = FlxMath.lerp(song.x, 125 + (65 * (song.ID - curSelected)), CoolUtil.lerpFix(0.1));
 			for (i in 0...songs.length)
-				song.y += (Math.sin(i+time)/2);
+				song.y += (Math.sin(i + time) / 2);
 		}
 
 		time += elapsed;
-		Shaders["chromatic aberration"].shader.data.rOffset.value = [chromeOffset*Math.sin(time)];
-		Shaders["chromatic aberration"].shader.data.bOffset.value = [-chromeOffset*Math.sin(time)];
+		Shaders["chromatic aberration"].shader.data.rOffset.value = [chromeOffset * Math.sin(time)];
+		Shaders["chromatic aberration"].shader.data.bOffset.value = [-chromeOffset * Math.sin(time)];
 
 		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, CoolUtil.boundTo(elapsed * 24, 0, 1)));
 		lerpRating = FlxMath.lerp(lerpRating, intendedRating, CoolUtil.boundTo(elapsed * 12, 0, 1));
@@ -366,11 +383,13 @@ class FreeplayState extends MusicBeatState
 			lerpRating = intendedRating;
 
 		var ratingSplit:Array<String> = Std.string(Highscore.floorDecimal(lerpRating * 100, 2)).split('.');
-		if(ratingSplit.length < 2) { //No decimals, add an empty space
+		if (ratingSplit.length < 2)
+		{ // No decimals, add an empty space
 			ratingSplit.push('');
 		}
-		
-		while(ratingSplit[1].length < 2) { //Less than 2 decimals in it, add decimals then
+
+		while (ratingSplit[1].length < 2)
+		{ // Less than 2 decimals in it, add decimals then
 			ratingSplit[1] += '0';
 		}
 
@@ -384,9 +403,10 @@ class FreeplayState extends MusicBeatState
 		var ctrl = FlxG.keys.justPressed.CONTROL;
 
 		var shiftMult:Int = 1;
-		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
+		if (FlxG.keys.pressed.SHIFT)
+			shiftMult = 3;
 
-		if(songs.length > 1)
+		if (songs.length > 1)
 		{
 			if (upP)
 			{
@@ -399,13 +419,13 @@ class FreeplayState extends MusicBeatState
 				holdTime = 0;
 			}
 
-			if(controls.UI_DOWN || controls.UI_UP)
+			if (controls.UI_DOWN || controls.UI_UP)
 			{
 				var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
 				holdTime += elapsed;
 				var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
 
-				if(holdTime > 0.5 && checkNewHold - checkLastHold > 0)
+				if (holdTime > 0.5 && checkNewHold - checkLastHold > 0)
 				{
 					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
 					changeDiff(0, true);
@@ -417,53 +437,54 @@ class FreeplayState extends MusicBeatState
 			changeDiff(-1);
 		else if (controls.UI_RIGHT_P)
 			changeDiff(1);
-		else if (upP || downP) changeDiff(0, true);
+		else if (upP || downP)
+			changeDiff(0, true);
 
 		if (controls.BACK)
 		{
-			if(colorTween != null) {
+			if (colorTween != null)
+			{
 				colorTween.cancel();
 			}
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			MusicBeatState.switchState(new menus.MasterFreeplayState());
 		}
 
-		if(ctrl)
+		if (ctrl)
 		{
 			openSubState(new substates.GameplayChangersSubstate());
 		}
-		else if(space)
+		else if (space)
 		{
-			if(instPlaying != curSelected)
+			if (instPlaying != curSelected)
 			{
 				#if PRELOAD_ALL
 				destroyFreeplayVocals();
 				FlxG.sound.music.volume = 0;
 
 				var songName:String = songs[curSelected].songName.toLowerCase();
-					
+
 				var poop:String = Highscore.formatSong(songName, curDifficulty);
 				PlayState.SONG = Song.loadFromJson(poop, songName);
 				// i only want the instrumental to play
-				//if (PlayState.SONG.needsVoices)
+				// if (PlayState.SONG.needsVoices)
 				//	vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-				//else
+				// else
 				//	vocals = new FlxSound();
 
-				//FlxG.sound.list.add(vocals);
+				// FlxG.sound.list.add(vocals);
 				FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 0.7);
-				//vocals.play();
-				//vocals.persist = true;
-				//vocals.looped = true;
-				//vocals.volume = 0.7;
+				// vocals.play();
+				// vocals.persist = true;
+				// vocals.looped = true;
+				// vocals.volume = 0.7;
 				instPlaying = curSelected;
 				#end
 			}
 		}
-
 		else if ((accepted) && !(hasAccepted))
 		{
-			//lol
+			// lol
 			hasAccepted = true;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
@@ -474,51 +495,61 @@ class FreeplayState extends MusicBeatState
 			PlayState.storyDifficulty = curDifficulty;
 
 			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
-			if(colorTween != null) {
+			if (colorTween != null)
+			{
 				colorTween.cancel();
 			}
-			
+
 			if ((songLowercase == 'trojan-virus') && !(FlxG.keys.pressed.ALT))
 			{
 				#if VIDEOS_ALLOWED
-				var video:misc.MP4Handler = new misc.MP4Handler();
-				video.playMP4(Paths.videoRon('trojan-virus'), new PlayState(), false, false, false);
+				video.onEndReached.add(function()
+				{
+					video.dispose();
+					FlxG.switchState(new PlayState());
+				});
+				video.play(Paths.video('trojan-virus'));
 				#end
 			}
 			else
+			{
+				if (FlxG.keys.pressed.SHIFT)
 				{
-				if (FlxG.keys.pressed.SHIFT){
 					LoadingState.loadAndSwitchState(new ChartingState());
-				}else{
+				}
+				else
+				{
 					LoadingState.loadAndSwitchState(new PlayState());
 				}
 			}
-			
+
 			FlxG.sound.music.volume = 0;
-					
+
 			destroyFreeplayVocals();
 		}
-		else if(controls.RESET)
+		else if (controls.RESET)
 		{
 			var songName:String = songs[curSelected].songName;
 			openSubState(new substates.ResetScoreSubState(songName, curDifficulty, songs[curSelected].songCharacter));
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
-		
-		switch(songs[curSelected].songName.toLowerCase())
+
+		switch (songs[curSelected].songName.toLowerCase())
 		{
 			case 'bleeding':
-				//camWhat.zoom = 1.2;
+				// camWhat.zoom = 1.2;
 			case 'bleeding-classic':
-				//camWhat.zoom = 1.2;
+				// camWhat.zoom = 1.2;
 			default:
 				camWhat.zoom = 1;
 		}
 		super.update(elapsed);
 	}
 
-	public static function destroyFreeplayVocals() {
-		if(vocals != null) {
+	public static function destroyFreeplayVocals()
+	{
+		if (vocals != null)
+		{
 			vocals.stop();
 			vocals.destroy();
 		}
@@ -531,9 +562,8 @@ class FreeplayState extends MusicBeatState
 
 		curDifficulty += change;
 
-
 		if (curDifficulty < 0)
-			curDifficulty = CoolUtil.difficulties.length-1;
+			curDifficulty = CoolUtil.difficulties.length - 1;
 		if (curDifficulty >= CoolUtil.difficulties.length)
 			curDifficulty = 0;
 
@@ -558,7 +588,8 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
-		if(playSound) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		if (playSound)
+			FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
 
@@ -567,16 +598,19 @@ class FreeplayState extends MusicBeatState
 		if (curSelected < 0)
 			curSelected = max - 1;
 		if (curSelected >= max)
-			curSelected = 0;	
-			
+			curSelected = 0;
+
 		var newColor:Int = songs[curSelected].color;
-		if(newColor != intendedColor) {
-			if(colorTween != null) {
+		if (newColor != intendedColor)
+		{
+			if (colorTween != null)
+			{
 				colorTween.cancel();
 			}
 			intendedColor = newColor;
 			colorTween = FlxTween.color(bg, 1, bg.color, intendedColor, {
-				onComplete: function(twn:FlxTween) {
+				onComplete: function(twn:FlxTween)
+				{
 					colorTween = null;
 				}
 			});
@@ -614,34 +648,36 @@ class FreeplayState extends MusicBeatState
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
-		
+
 		PlayState.storyWeek = songs[curSelected].week;
 
 		CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
 		var diffStr:String = WeekData.getCurrentWeek().difficulties;
-		if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
+		if (diffStr != null)
+			diffStr = diffStr.trim(); // Fuck you HTML5
 
-		if(diffStr != null && diffStr.length > 0)
+		if (diffStr != null && diffStr.length > 0)
 		{
 			var diffs:Array<String> = diffStr.split(',');
 			var i:Int = diffs.length - 1;
 			while (i > 0)
 			{
-				if(diffs[i] != null)
+				if (diffs[i] != null)
 				{
 					diffs[i] = diffs[i].trim();
-					if(diffs[i].length < 1) diffs.remove(diffs[i]);
+					if (diffs[i].length < 1)
+						diffs.remove(diffs[i]);
 				}
 				--i;
 			}
 
-			if(diffs.length > 0 && diffs[0].length > 0)
+			if (diffs.length > 0 && diffs[0].length > 0)
 			{
 				CoolUtil.difficulties = diffs;
 			}
 		}
-		
-		if(CoolUtil.difficulties.contains(CoolUtil.defaultDifficulty))
+
+		if (CoolUtil.difficulties.contains(CoolUtil.defaultDifficulty))
 		{
 			curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
 		}
@@ -651,8 +687,8 @@ class FreeplayState extends MusicBeatState
 		}
 
 		var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
-		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
-		if(newPos > -1)
+		// trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
+		if (newPos > -1)
 		{
 			curDifficulty = newPos;
 		}
@@ -662,20 +698,23 @@ class FreeplayState extends MusicBeatState
 			FlxTween.globalManager.completeTweensOf(portrait);
 			portrait.screenCenter(Y);
 
-			FlxTween.tween(portrait, {y: portrait.y + 45}, 0.2, {ease: FlxEase.quintIn, onComplete: function(twn:FlxTween) {
-				updateportrait();
-				var mfwY = portrait.y;
-				portrait.y -= 20;
-				FlxTween.tween(portrait, {y: mfwY}, 0.4, {ease: FlxEase.elasticOut});
-			}});
+			FlxTween.tween(portrait, {y: portrait.y + 45}, 0.2, {
+				ease: FlxEase.quintIn,
+				onComplete: function(twn:FlxTween)
+				{
+					updateportrait();
+					var mfwY = portrait.y;
+					portrait.y -= 20;
+					FlxTween.tween(portrait, {y: mfwY}, 0.4, {ease: FlxEase.elasticOut});
+				}
+			});
 		}
 		else
 			updateportrait();
-			
-
 	}
 
-	private function positionHighscore() {
+	private function positionHighscore()
+	{
 		scoreText.x = FlxG.width - scoreText.width - 6;
 
 		scoreBG.scale.x = FlxG.width - scoreText.x + 6;
@@ -683,17 +722,19 @@ class FreeplayState extends MusicBeatState
 		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
 		diffText.x -= diffText.width / 2;
 	}
-	
-	private function updateportrait() {
-		portrait.loadGraphic(Paths.image('freeplayportraits/'+songs[curSelected].songName.toLowerCase()));
-		portrait.scale.set(0.5,0.5);
+
+	private function updateportrait()
+	{
+		portrait.loadGraphic(Paths.image('freeplayportraits/' + songs[curSelected].songName.toLowerCase()));
+		portrait.scale.set(0.5, 0.5);
 		portrait.updateHitbox();
 		portrait.screenCenter(XY);
-		
-		if ((songs[curSelected].songName.toLowerCase() == 'slammed') || (songs[curSelected].songName.toLowerCase() == 'oh-my-god-hes-ballin'))
+
+		if ((songs[curSelected].songName.toLowerCase() == 'slammed')
+			|| (songs[curSelected].songName.toLowerCase() == 'oh-my-god-hes-ballin'))
 		{
-			portraitOverlay.loadGraphic(Paths.image('freeplayportraits/'+songs[curSelected].songName.toLowerCase()+'-over'));
-			portraitOverlay.scale.set(0.5,0.5);
+			portraitOverlay.loadGraphic(Paths.image('freeplayportraits/' + songs[curSelected].songName.toLowerCase() + '-over'));
+			portraitOverlay.scale.set(0.5, 0.5);
 			portraitOverlay.updateHitbox();
 			portraitOverlay.screenCenter(XY);
 			portraitOverlay.visible = true;
@@ -701,40 +742,40 @@ class FreeplayState extends MusicBeatState
 		else
 			portraitOverlay.visible = false;
 	}
-	
-	private function shadering() {
+
+	private function shadering()
+	{
 		clearShader(camWhat);
 		clearShader(camText);
 		addShader(camWhat, "chromatic aberration");
 		addShader(camWhat, "fake CRT");
 		addShader(camText, "fisheye");
 		Shaders["fisheye"].shader.data.MAX_POWER.value = [0.2];
-		Shaders["chromatic aberration"].shader.data.rOffset.value = [chromeOffset/2];
+		Shaders["chromatic aberration"].shader.data.rOffset.value = [chromeOffset / 2];
 		Shaders["chromatic aberration"].shader.data.gOffset.value = [0.0];
 		Shaders["chromatic aberration"].shader.data.bOffset.value = [chromeOffset * -1];
-		
+
 		if (mode == 'classic')
 			addShader(camWhat, "vhs");
 		switch (songs[curSelected].songName.toLowerCase())
 		{
 			case "trojan virus" | "bleeding":
-				addShader(camWhat,"glitchsmh");
-				Shaders["glitchsmh"].shader.data.on.value = [1.];		
+				addShader(camWhat, "glitchsmh");
+				Shaders["glitchsmh"].shader.data.on.value = [1.];
 			case "gron":
-				//grayscale looks better unless a cooler paper shader is found
-				//addShader(camWhat,"paper");
-				addShader(camWhat,"grayscale");
+				// grayscale looks better unless a cooler paper shader is found
+				// addShader(camWhat,"paper");
+				addShader(camWhat, "grayscale");
 		}
 	}
-	
-	
+
 	override function beatHit()
 	{
 		if (curBeat % 2 == 1)
 			FlxG.camera.zoom = 1.05;
 		else
 			FlxG.camera.zoom = 0.95;
-					
+
 		FlxTween.tween(FlxG.camera, {zoom: 1}, 0.2, {ease: FlxEase.quadInOut});
 		super.beatHit();
 	}
@@ -754,6 +795,7 @@ class SongMetadata
 		this.week = week;
 		this.songCharacter = songCharacter;
 		this.color = color;
-		if(this.folder == null) this.folder = '';
+		if (this.folder == null)
+			this.folder = '';
 	}
 }

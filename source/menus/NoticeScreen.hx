@@ -107,8 +107,7 @@ class NoticeScreen extends MusicBeatState
 		if (mmtw.volume < .5) {
 			mmtw.volume += elapsed * .01;
 		}
-		
-		if (FlxG.keys.justPressed.ENTER){
+		if (controls.ACCEPT){// meu emu n curte enter
 			mmtw.destroy();
 			FlxG.sound.play(Paths.sound('resumeSong'));
 			FlxTween.tween(FlxG.camera, {zoom: 0.5, angle: 45}, 0.5, {ease: FlxEase.quadIn});

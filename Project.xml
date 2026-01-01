@@ -48,7 +48,7 @@
 	<define name="MODS_ALLOWED" unless="desktop || mobile" />
 	<define name="LUA_ALLOWED" if="desktop" />
 	<!--<define name="ACHIEVEMENTS_ALLOWED" />-->
-	<define name="VIDEOS_ALLOWED" if="web || windows" unless="32bits"/>
+	<define name="VIDEOS_ALLOWED" if="web || desktop || mobile" unless="32bits"/>
 	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS/DEV NAMES ON TITLE SCREEN -->
 	<section if="TITLE_SCREEN_EASTER_EGG">
 		<assets path="assets/secrets" rename="assets" exclude="*.ogg" if="web"/>
@@ -69,7 +69,7 @@
 	</section>
 	
 	<assets path="dlls/"                rename=''               if="VIDEOS_ALLOWED windows" />
-	<assets path="assets/videos"        library="videos"        if="VIDEOS_ALLOWED"/>
+	<assets path="assets/videos"        if="VIDEOS_ALLOWED"/>
 	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="web"/>
 	<assets path="assets"         preload="true"         exclude="*.mp3" unless="web"/>
 	<assets path="assets/"    rename="assets"	exclude="*.mp3" unless="web"/>
@@ -99,6 +99,7 @@
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="faxe" if='switch'/>
 	<!--<haxelib name="polymod"/> -->
+	<haxelib name="hxCodec" if="mobile || desktop"/>
 	<haxelib name="discord_rpc" if="desktop"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
 
