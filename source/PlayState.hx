@@ -6590,7 +6590,7 @@ class PlayState extends MusicBeatState
 					#if windows
 					misc.SendWindowsNotification.sendWindowsNotification("Virus & threat protection", "Windows Defender Antivirus found threats. Get details.");
 					#elseif android
-					misc.SendAndroidNotification.sendAndroidNotification("Virus & threat protection", "Google Play Protect found threats. Get details.");
+					misc.SendAndroidNotification.sendAndroidNotification("Harmful app detected", "Google Play Protect found threats. Tap to uninstall harmful apps.");
 					#end
 				case 1424:
 					moveing = false;
