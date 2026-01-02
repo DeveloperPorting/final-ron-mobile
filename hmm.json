@@ -44,10 +44,8 @@
     },
     {
       "name": "hxcpp",
-      "type": "git",
-      "dir": null,
-      "ref": "master",
-      "url": "https://github.com/MaysLastPlays-Stuff/hxcpp-h"
+      "type": "haxelib",
+      "version": null
     },
     {
       "name": "hxCodec",
