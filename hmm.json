@@ -44,8 +44,10 @@
     },
     {
       "name": "hxcpp",
-      "type": "haxelib",
-      "version": null
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/MaysLastPlays-Stuff/hxcpp-h"
     },
     {
       "name": "hxCodec",
@@ -66,5 +68,5 @@
       "ref": "main",
       "url": "https://github.com/MAJigsaw77/extension-androidtools"
     }
-]
+  ]
 }
